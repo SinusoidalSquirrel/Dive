@@ -26,7 +26,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   .state('app', {
     url: "/app",
     abstract: true,
-    templateUrl: "templates/menu.html",
+    templateUrl: "menu/menu.html",
     controller: 'AppCtrl'
   })
 
@@ -34,7 +34,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     url: "/setlocation",
     views: {
       'menuContent': {
-        templateUrl: "templates/setlocation.html"
+        templateUrl: "SetLocation/setlocation.html"
+      }
+    }
+  })
+  .state('app.login', {
+    url: "/login",
+    views: {
+      'menuContent': {
+        templateUrl: "Login/login.html"
       }
     }
   })
@@ -42,7 +50,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     url: "/main",
     views: {
       'menuContent': {
-        templateUrl: "templates/main.html",
+        templateUrl: "Main/main.html",
         controller: 'MainCtrl'
       }
     }
