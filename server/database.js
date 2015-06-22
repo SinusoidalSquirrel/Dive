@@ -1117,17 +1117,6 @@ client.hgetall('hall-of-flame-burgers-san-francisco', function(err, object) {
 
 client.sinterstore(restaurantList, restaurantList, "testList");
 
-client.scard(restaurantList, function(err, count) {
-    console.log(count);
-});
- //console.log(john);
- // client.smembers(restaurantList, function(err, list) {
- //     console.log(list);
- // });
-
-
-
-
 var Rater = function(db, kind) {
   this.db = db;
   this.kind = kind;
@@ -1154,14 +1143,14 @@ Rater.prototype.remove = function(userID, restaurantID, done) {
 Rater.prototype.itemsByUser = function(userID, done) {
   var userSentimentList = userID + ":" + this.kind;
   this.db.smembers(userSentimentList, function(err, reply) {
-    console.log(reply);
+//    console.log(reply);
   });  
 };
 
 Rater.prototype.usersByItem = function(restaurantID, done) {
   var restaurantSentimentList = restaurantID + ":" + this.kind;
   this.db.smembers(restaurantSentimentList, function(err, reply) {
-    console.log(reply);
+    console.log("USERS BY ITEM " + reply);
   });
 };
 
@@ -1190,17 +1179,18 @@ Similars.prototype.update = function(userID) {
     for (var i = 0; i < restaurantArray.length; i++) {
       //WILL THIS THROW ERROR BECAUSE COMPARISONMEMBERS NOT DEFINED?
       var john = restaurantArray[i];
-      console.log(john);
-      that.db.smembers(restaurantArray[i]+":Likes", function(err, answer) {
-        console.log(answer);
- //       console.log(john);
+      // that.db.smembers(restaurantArray[i]+":Likes", function(err, answer) {
+      //   console.log(answer);
+      // });
 
-      });
- //     console.log(restaurantArray[i]);
-      that.db.sunion("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Likes");
-      that.db.sunion("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Dislikes");
+      that.db.sunionstore("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Likes");
+      that.db.sunionstore("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Dislikes");
     }
-    that.db.srem("comparisonMembers", userID);
+//    that.db.srem("comparisonMembers", userID);
+    for (i = 0; i < 10000000; i++) {
+        j = 1;
+
+    }
     that.db.smembers("comparisonMembers", function(err, compMembersArray) {
       var comparisonIndex;
       var commonLikes;
@@ -1211,26 +1201,28 @@ Similars.prototype.update = function(userID) {
       var otherUserDislikes;
 
       for (i = 0; i < compMembersArray.length; i++) {
-
+        console.log(compMembersArray.length);
         otherUserLikes = compMembersArray[i] + ":Likes";
         otherUserDislikes = compMembersArray[i] + ":Dislikes";        
         //these are temporary lists, need to clear them somehow
   
-        that.db.sinter("commonLikes", userLikes, otherUserLikes);
-        that.db.sinter("commonDislikes", userDislikes, otherUserDislikes);
-        that.db.sinter("conflicts1", userLikes, otherUserDislikes);
-        that.db.sinter("conflicts2", userDislikes, otherUserLikes);
-        that.db.sunion("allRatedRestaurants", userLikes, otherUserLikes,
+        that.db.sinterstore("commonLikes", userLikes, otherUserLikes);
+        that.db.sinterstore("commonDislikes", userDislikes, otherUserDislikes);
+        that.db.sinterstore("conflicts1", userLikes, otherUserDislikes);
+        that.db.sinterstore("conflicts2", userDislikes, otherUserLikes);
+        that.db.sunionstore("allRatedRestaurants", userLikes, otherUserLikes,
                         userDislikes, otherUserDislikes);
 
-        scard("commonLikes", function(err, commonLikesCount) {
-          scard("commonDislikes", function(err, commonDislikesCount) {
-            scard("conflicts1", function(err, conflicts1Count) {
-              scard("conflicts2", function(err, conflicts2Count) {
-                scard("allRatedRestaurants", function(err, allRatedRestaurantsCount) {
+        that.db.scard("commonLikes", function(err, commonLikesCount) {
+            console.log("COMMON LIKES:  " + userID + "-  " + commonLikesCount);
+          that.db.scard("commonDislikes", function(err, commonDislikesCount) {
+            that.db.scard("conflicts1", function(err, conflicts1Count) {
+              that.db.scard("conflicts2", function(err, conflicts2Count) {
+                that.db.scard("allRatedRestaurants", function(err, allRatedRestaurantsCount) {
                   console.log("HELLO");
-                  console.log((commonLikesCount + commonDislikesCount -
-                               conflicts1Count - conflicts2Count) / allRatedRestaurantsCount);
+                  console.log(allRatedRestaurantsCount);
+                  console.log((Number(commonLikesCount) + Number(commonDislikesCount) -
+                               Number(conflicts1Count) - Number(conflicts2Count)) / Number(allRatedRestaurantsCount));
 
                 });
               });
@@ -1252,6 +1244,8 @@ raterLikes.add(1, "def");
 raterLikes.add(1, "ghi");
 raterLikes.add(1, "jkl");
 raterLikes.add(1, "mno");
+raterLikes.add(1, "vwx");
+
 
 raterLikes.add(2, "def");
 raterLikes.add(2, "ghi");
@@ -1259,8 +1253,10 @@ raterLikes.add(2, "jkl");
 raterLikes.add(2, "mno");
 raterLikes.add(2, "pqr");
 raterLikes.add(2, "stu");
-raterLikes.add(2, "vwx");
 raterLikes.add(2, "yz");
+
+raterLikes.add(3, "abc");
+raterLikes.add(3, "def");
 
 
 raterDislikes.add(1, "123");
@@ -1275,6 +1271,7 @@ raterDislikes.add(2, "101112");
 raterDislikes.add(2, "131415");
 
 //raterLikes.itemsByUser(2);
+
 raterLikes.usersByItem("vwx");
 similars.update(1);
 
