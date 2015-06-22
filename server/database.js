@@ -8,6 +8,8 @@ client.on('connect', function() {
     console.log('connected');
 });
 
+client.flushdb();
+
 // client.sadd("users", "user:rahul");
 // client.hmset("user:rahul", "username", "rahul", "foo", "bar");
 
@@ -1097,18 +1099,185 @@ var restaurantList = "restaurants:" + location;
 
 for (var i = 0; i < yelp.businesses.length; i++) {
   restaurant = yelp.businesses[i];
-  console.log(restaurant.id);
   client.hmset(restaurant.id, {
     name: restaurant.name,
     url: restaurant.mobile_url
   });  
 
  client.sadd(restaurantList, restaurant.id);
+ if (i < 5 ) {
+    client.sadd("testList", restaurant.id);
+ }
 }
 
 
 client.hgetall('hall-of-flame-burgers-san-francisco', function(err, object) {
   console.log(object);
 });
+
+client.sinterstore(restaurantList, restaurantList, "testList");
+
+client.scard(restaurantList, function(err, count) {
+    console.log(count);
+});
+ //console.log(john);
+ // client.smembers(restaurantList, function(err, list) {
+ //     console.log(list);
+ // });
+
+
+
+
+var Rater = function(db, kind) {
+  this.db = db;
+  this.kind = kind;
+  // this.db = redis.createClient();
+  // this.db.on('connect', function() {
+  //     console.log('connected');
+  // });  
+};
+
+Rater.prototype.add = function(userID, restaurantID, done) {
+  var userSentimentList = userID + ":" + this.kind;
+  var restaurantSentimentList = restaurantID + ":" + this.kind;
+  this.db.sadd(userSentimentList, restaurantID);
+  this.db.sadd(restaurantSentimentList, userID);  
+};
+
+Rater.prototype.remove = function(userID, restaurantID, done) {
+  var userSentimentList = userID + ":" + this.kind;
+  var restaurantSentimentList = restaurantID + ":" + this.kind;
+  this.db.srem(userSentimentList, restaurantID);
+  this.db.srem(restaurantSentimentList, userID);
+};
+
+Rater.prototype.itemsByUser = function(userID, done) {
+  var userSentimentList = userID + ":" + this.kind;
+  this.db.smembers(userSentimentList, function(err, reply) {
+    console.log(reply);
+  });  
+};
+
+Rater.prototype.usersByItem = function(restaurantID, done) {
+  var restaurantSentimentList = restaurantID + ":" + this.kind;
+  this.db.smembers(restaurantSentimentList, function(err, reply) {
+    console.log(reply);
+  });
+};
+
+
+// Find union of users likes and dislikes
+// Find all users who have rated anything on that userList
+// compute list of similarity index for each user found and create new list
+
+var Similars = function(db) {
+  this.db = db;
+  this.similars = ""; 
+};
+
+Similars.prototype.byUser = function(userID) {
+  // var userSimilarsList = userID + ":Similars";
+  // this.db.smembers(userSimilarsList);  
+};
+
+Similars.prototype.update = function(userID) {
+  var userLikes = userID + ":Likes";
+  var userDislikes = userID + ":Dislikes";
+
+  this.db.sunionstore("userRated", userLikes, userDislikes);
+  var that = this;
+  this.db.smembers("userRated", function(err, restaurantArray) {
+    for (var i = 0; i < restaurantArray.length; i++) {
+      //WILL THIS THROW ERROR BECAUSE COMPARISONMEMBERS NOT DEFINED?
+      var john = restaurantArray[i];
+      console.log(john);
+      that.db.smembers(restaurantArray[i]+":Likes", function(err, answer) {
+        console.log(answer);
+ //       console.log(john);
+
+      });
+ //     console.log(restaurantArray[i]);
+      that.db.sunion("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Likes");
+      that.db.sunion("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Dislikes");
+    }
+    that.db.srem("comparisonMembers", userID);
+    that.db.smembers("comparisonMembers", function(err, compMembersArray) {
+      var comparisonIndex;
+      var commonLikes;
+      var commonDislikes;
+      var conflicts1;
+      var conflicts2;      
+      var otherUserLikes;
+      var otherUserDislikes;
+
+      for (i = 0; i < compMembersArray.length; i++) {
+
+        otherUserLikes = compMembersArray[i] + ":Likes";
+        otherUserDislikes = compMembersArray[i] + ":Dislikes";        
+        //these are temporary lists, need to clear them somehow
+  
+        that.db.sinter("commonLikes", userLikes, otherUserLikes);
+        that.db.sinter("commonDislikes", userDislikes, otherUserDislikes);
+        that.db.sinter("conflicts1", userLikes, otherUserDislikes);
+        that.db.sinter("conflicts2", userDislikes, otherUserLikes);
+        that.db.sunion("allRatedRestaurants", userLikes, otherUserLikes,
+                        userDislikes, otherUserDislikes);
+
+        scard("commonLikes", function(err, commonLikesCount) {
+          scard("commonDislikes", function(err, commonDislikesCount) {
+            scard("conflicts1", function(err, conflicts1Count) {
+              scard("conflicts2", function(err, conflicts2Count) {
+                scard("allRatedRestaurants", function(err, allRatedRestaurantsCount) {
+                  console.log("HELLO");
+                  console.log((commonLikesCount + commonDislikesCount -
+                               conflicts1Count - conflicts2Count) / allRatedRestaurantsCount);
+
+                });
+              });
+            });
+          });
+        });
+      }
+    });
+  });
+};
+
+var raterLikes = new Rater(client, "Likes");
+var raterDislikes = new Rater(client, "Dislikes");
+var similars = new Similars(client);
+
+
+raterLikes.add(1, "abc");
+raterLikes.add(1, "def");
+raterLikes.add(1, "ghi");
+raterLikes.add(1, "jkl");
+raterLikes.add(1, "mno");
+
+raterLikes.add(2, "def");
+raterLikes.add(2, "ghi");
+raterLikes.add(2, "jkl");
+raterLikes.add(2, "mno");
+raterLikes.add(2, "pqr");
+raterLikes.add(2, "stu");
+raterLikes.add(2, "vwx");
+raterLikes.add(2, "yz");
+
+
+raterDislikes.add(1, "123");
+raterDislikes.add(1, "456");
+raterDislikes.add(1, "789");
+raterDislikes.add(1, "101112");
+raterDislikes.add(1, "131415");
+
+raterDislikes.add(2, "abc");
+raterDislikes.add(2, "123");
+raterDislikes.add(2, "101112");
+raterDislikes.add(2, "131415");
+
+//raterLikes.itemsByUser(2);
+raterLikes.usersByItem("vwx");
+similars.update(1);
+
+
 
 module.exports.client;
