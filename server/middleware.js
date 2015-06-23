@@ -5,14 +5,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 module.exports = function(app, express){
-    var linkRouter = express.Router();
-    var yelpRouter = express.Router();
     var routes = require('./routes/index');
     var users = require('./routes/users');
-
-
-    // require('./linkRouter.js')(linkRouter);
+    var yelpRouter = express.Router();
+    var choiceRouter = express.Router();
     require('./routes/yelpRouter.js')(yelpRouter);
+    require('./routes/choiceRouter.js')(choiceRouter);
 
 
     app.set('views', path.join(__dirname, 'views'));
@@ -30,8 +28,8 @@ module.exports = function(app, express){
 
     app.use('/', routes);
     app.use('/users', users);
-    // app.use('/', linkRouter);
     app.use('/yelpapi/', yelpRouter);
+    app.use('/choice/', choiceRouter);
 
 
     // catch 404 and forward to error handler
@@ -64,11 +62,5 @@ module.exports = function(app, express){
         error: {}
       });
     });
-
-
-
-
-    // app.use(express.static(__dirname + '/../bower_components')
-
 
 }
