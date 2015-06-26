@@ -1,18 +1,22 @@
-var _ = require('underscore');
-var async = require('async');
+var redis = require('redis');
+var Promise = require("bluebird");
+Promise.promisifyAll(require("redis"));
 
-var Rater = function(e, db, kind){
-  this.engine = e;
+
+var Rater = function(db, kind) {
   this.db = db;
-  this.kind = kind; 
+  this.kind = kind;
 };
 
-
 Rater.prototype.add = function(userID, restaurantID, done) {
+  var db = this.db;
   var userSentimentList = userID + ":" + this.kind;
   var restaurantSentimentList = restaurantID + ":" + this.kind;
-  this.db.sadd(userSentimentList, restaurantID);
-  this.db.sadd(restaurantSentimentList, userID);  
+  db.sadd(userSentimentList, restaurantID);
+  db.sadd(restaurantSentimentList, userID);
+  db.get(userID + ":Location", function(err, location) {
+    db.sadd("restaurants:" + location, restaurantID);
+  });
 };
 
 Rater.prototype.remove = function(userID, restaurantID, done) {
@@ -32,10 +36,9 @@ Rater.prototype.itemsByUser = function(userID, done) {
 Rater.prototype.usersByItem = function(restaurantID, done) {
   var restaurantSentimentList = restaurantID + ":" + this.kind;
   this.db.smembers(restaurantSentimentList, function(err, reply) {
-    // console.log("USERS BY ITEM " + reply);
+    console.log("USERS BY ITEM " + reply);
   });
 };
-
 
 
 module.exports = Rater;
