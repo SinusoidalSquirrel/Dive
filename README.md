@@ -5,8 +5,8 @@
 ## Team
 
   - __Product Owner__: Bryan Liu
-  - __Scrum Master__: teamMember
-  - __Development Team Members__: John Paulino, teamMember
+  - __Scrum Master__: Jack McDevitt
+  - __Development Team Members__: John Paulino, Stacy Huang
 
 ## Table of Contents
 
@@ -26,23 +26,40 @@
 
 - Node 0.10.x
 - Redis 2.6.x
-- Postgresql 9.1.x
-- etc
-- etc
+- Ionic ^1.5.5
+- Cordova ^5.1.1
+- ion-sim ^3.1.1
 
 ## Development
 
 ### Installing Dependencies
 
 From within the root directory:
+```sh
+npm install
+```
+
+From within the public directory:
 
 ```sh
-sudo npm install -g bower
 npm install
-bower install
+```
+
+### Get Started:
+
+```sh
+ionic build ios
+//for ios specifically
+ionic build android
+//for ionic specifically
+ionic serve
+//to run in browser
+ionic emulate
+//to run in emulator
 ```
 
 ### Roadmap
+
 
 View the project roadmap [here](LINK_TO_PROJECT_ISSUES)
 
