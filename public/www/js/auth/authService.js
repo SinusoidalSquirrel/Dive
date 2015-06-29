@@ -1,6 +1,6 @@
 (function() {
-  var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
-  // var serverUrl = ""; // this is for localhost testing
+  // var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
+  var serverUrl = ""; // this is for localhost testing
 
   angular
     .module('dive')
