@@ -61,7 +61,7 @@ ionic emulate
 ### Roadmap
 
 
-View the project roadmap [here](LINK_TO_PROJECT_ISSUES)
+View the project roadmap [CurrentProjectRoadMap.md](CurrentProjectRoadMap.md)
 
 
 ## Contributing
