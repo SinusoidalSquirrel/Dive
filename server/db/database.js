@@ -1,7 +1,23 @@
 var redis = require('redis');
 
+<<<<<<< HEAD
 // By default, redis.createClient() will use 127.0.0.1 and 6379 as the hostname and port respectively.
 // var client = redis.createClient(port, host);
+=======
+// The schema for our database is as follows:
+
+// A user's "Likes" set is saved under the key:  "{userID}:Likes"
+// A user's "Dislikes" set is saved under the key:  "{userID}:Dislikes"
+// A user's "Kept" set is saved under the key:  "{userID}:Kept"
+
+// All of the above sets contain a list of retaurant IDs (determined by 
+// the ID property given by Yelp to its restaurant records) 
+
+// A user's location is saved under "{userID}:Location"
+
+// The record for a restaurant is saved in a redis hash using the 
+// the restaurant's ID as the key.
+>>>>>>> rebasing/androiddeploy
 
 console.log("process.env.REDISTOGO_URL: ", process.env);
 if (process.env.REDISTOGO_URL) {

@@ -1,11 +1,18 @@
 var yelpController = require('./yelpController.js')
 
 module.exports = function(app){
+		console.log("called");
     app.route('/search/*')
         .post(yelpController.searchQuery)
 
     app.route('/business/')
         .post(yelpController.businessQuery)
+<<<<<<< HEAD
+=======
+
+    app.route('/feeling/')
+        .post(yelpController.feelingQuery)
+>>>>>>> rebasing/androiddeploy
     app.route('/geolocation/')
         .post(yelpController.geolocationQuery)
 }

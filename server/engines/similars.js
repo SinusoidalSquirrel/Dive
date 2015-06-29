@@ -2,95 +2,116 @@ var redis = require('redis');
 var Promise = require("bluebird");
 Promise.promisifyAll(require("redis"));
 
+// This class is used to update the similars list of a user.
+// The similars list is the list of other members who have similar
+// tastes as the user, ranked by their similarity scores.
+
 var Similars = function(db) {
   this.db = db;
   this.similars = ""; 
 };
 
-Similars.prototype.byUser = function(userID) {
-  // var userSimilarsList = userID + ":Similars";
-  // this.db.smembers(userSimilarsList);  
-};
 
 Similars.prototype.update = function(userID) {
+
+// This method updates the "similars list" for the user whose
+// id is passed to the method as an argument.
+// The similars list is stored as a redis set, the key of which 
+// is in the following format:  {userID}:Similars 
+
   var userLikes = userID + ":Likes";
   var userDislikes = userID + ":Dislikes";
+  var db = this.db;
 
-  var otherUserList = [];
-  var otherUserScore = [];
+  // Get list of restaurants that user has rated
 
+  db.sunionAsync(userLikes, userDislikes).
+  then(function(userRatedRests) {    
+    db.del("comparisonMembers");
 
-  this.db.sunionstore("userRated", userLikes, userDislikes);
-  var that = this;
-  this.db.smembers("userRated", function(err, restaurantArray) {
-    for (var i = 0; i < restaurantArray.length; i++) {
+    // Get list of all members who have rated any of the restaurants that the
+    // user has rated.  Those are the "comparison members".
 
-      that.db.sunionstore("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Likes");
-      that.db.sunionstore("comparisonMembers", "comparisonMembers", restaurantArray[i] + ":Dislikes");
+    for (var i = 0; i < userRatedRests.length; i++) {
+      db.sunionstore("comparisonMembers", "comparisonMembers", userRatedRests[i] + ":Likes");
+      db.sunionstore("comparisonMembers", "comparisonMembers", userRatedRests[i] + ":Dislikes");
     }
-    that.db.srem("comparisonMembers", userID);
-  
-    that.db.smembers("comparisonMembers", function(err, compMembersArray) {
-      var comparisonIndex;
-      var commonLikes;
-      var commonDislikes;
-      var conflicts1;
-      var conflicts2;      
-      var otherUserLikes;
-      var otherUserDislikes;
+    db.srem("comparisonMembers", userID);
 
-      var commonLikesArr = [];
-      var commonDislikesArr = [];
-      var conflicts1Arr = [];
-      var conflicts2Arr = [];
-      var allRatedRestaurantsArr = [];
+    db.smembers("comparisonMembers", function(err, compMembersArray) {
+      compMembersArray.forEach(function(member) {
 
-      for (i = 0; i < compMembersArray.length; i++) {
+      // For each comparison member, do the following:
 
-        otherUserLikes = compMembersArray[i] + ":Likes";
-        otherUserDislikes = compMembersArray[i] + ":Dislikes";
+        var commonLikes;
+        var commonDislikes;
+        var conflicts1;
+        var conflicts2;
+        var allRatedRestaurants;
 
-        otherUserList.push(compMembersArray[i]); 
+        var otherUserLikes = member + ":Likes";
+        var otherUserDislikes = member + ":Dislikes";
 
-        that.db.sinterstore("commonLikes", userLikes, otherUserLikes);
-        that.db.sinterstore("commonDislikes", userDislikes, otherUserDislikes);
-        that.db.sinterstore("conflicts1", userLikes, otherUserDislikes);
-        that.db.sinterstore("conflicts2", userDislikes, otherUserLikes);
-        that.db.sunionstore("allRatedRestaurants", userLikes, otherUserLikes,
-                        userDislikes, otherUserDislikes);
+        // Find the restaurants that both the user and the comparison
+        // member like.  The number of these restaurants increases
+        // the users' similarity factor.
 
-        that.db.scard("commonLikes", function(err, commonLikesCount) {
-          commonLikesArr.push(commonLikesCount);
+        db.sinterAsync(userLikes, otherUserLikes).
+        then(function(answer) {
+          commonLikes = answer;
+
+        // Find the restaurants that both the user and the comparison
+        // member dislike.  The number of these restaurants increases
+        // the users' similarity factor.
+
+          return db.sinterAsync(userDislikes, otherUserDislikes);
+        }).
+        then(function(answer) {
+          commonDislikes = answer;
+
+        // Find the restaurants that the user likes but which the comparison
+        // user dislikes.  These are conflicts, and the number of these
+        // restaurants decreases the users' similarity factor.
+
+          return db.sinterAsync(userLikes, otherUserDislikes);
+        }).
+        then(function(answer) {
+          conflicts1 = answer;
+
+        // Find the restaurants that the user dislikes but which the comparison
+        // user likes.  These are conflicts, and the number of these
+        // restaurants decreases the users' similarity factor.
+
+          return db.sinterAsync(userDislikes, otherUserLikes);
+        }).
+        then(function(answer) {
+          conflicts2 = answer;
+
+        // Get list of all restaurants rated by either the user or the 
+        // comparison member
+
+          return db.sunionAsync(userLikes, otherUserLikes,
+                                userDislikes, otherUserDislikes);
+        }).
+        then(function(answer) {
+          allRatedRestaurants = answer;
+
+        // Calculate comparisonIndex 
+
+          var comparisonIndex = (commonLikes.length + commonDislikes.length -
+                                 conflicts1.length - conflicts2.length) /
+                                 allRatedRestaurants.length;
+
+        // Update the similars list of both the user and the comparison
+        // member with our newly calculated index
+
+          db.zadd(userID + ":Similars", comparisonIndex, member);
+          db.zadd(member + ":Similars", comparisonIndex, userID);
+
         });
-
-        that.db.scard("commonDislikes", function(err, commonDislikesCount) {
-          commonDislikesArr.push(commonDislikesCount);
-        });
-
-        that.db.scard("conflicts1", function(err, conflicts1Count) {
-          conflicts1Arr.push(conflicts1Count);
-        });
-
-        that.db.scard("conflicts2", function(err, conflicts2Count) {
-          conflicts2Arr.push(conflicts2Count);
-        });
-
-        that.db.scard("allRatedRestaurants", function(err, allRatedRestaurantsCount) {
-          allRatedRestaurantsArr.push(allRatedRestaurantsCount);
-          if (compMembersArray.length === commonLikesArr.length) {
-            for (var k = 0; k < commonLikesArr.length; k++) {
-              comparisonIndex = (Number(commonLikesArr[k]) + Number(commonDislikesArr[k]) -
-                       Number(conflicts1Arr[k]) - Number(conflicts2Arr[k])) / Number(allRatedRestaurantsArr[k]);
-              console.log("COMPARISON INDEX " + userID + ":  " + compMembersArray[k] + "  " + comparisonIndex);
-              that.db.zadd(userID + ":Similars", comparisonIndex, compMembersArray[k]);
-              that.db.zrange(userID + ":Similars", 0, -1, function(err, answer) {
-              });
-            }
-          }
-        });
-      }
+      });
     });
-});
+  });
 };
 
 module.exports = Similars;

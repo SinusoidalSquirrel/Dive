@@ -1,8 +1,14 @@
+// RECOMMENDATION ALGORITHM:
+// The recommendation algorithm is based on a tutorial located at
+// http://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
+
 var Rater = require('./rater.js');
 var Similars = require('./similars.js');
 var Suggestions = require('./suggestions.js');
 
-// Engine is the main hub that connects with other module.  Other modules will be passed in this instance of Engine
+// Engine is the class that consolidates all the functionality of 
+// the recommendation algorithm.
+// A Redis database is passed as an argument during creation.
 
 var Engine = function(db){
     this.likes = new Rater(db, 'Likes');

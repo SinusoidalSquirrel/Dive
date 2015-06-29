@@ -3,30 +3,28 @@
 
     <div class="item item-body">
       <!-- src references the yelp api provided image, full-image tag -->
-      <img class="full-image" src="{{card.image_url}}">
+      <img class="full-image" src="{{card.image}}">
       <p>
         <!-- House image provided by ionicons-->
         <i class="icon ion-home"> </i>
-          <!-- Three-part location in the following format:
-                        Street address
-                        Neighborhood
-                        City and Zipcode -->
-        {{card.location.display_address[0]}}, 
-        {{card.location.display_address[1]}}
-        <br />
-        {{card.location.display_address[2]}}
+        <!-- Three-part location in the following format:
+                      Street address
+                      Neighborhood
+                      City and Zipcode -->
+        {{card.location}}, 
+        <!-- {{card.location.display_address[1]}} -->
         <br />
         <br />
         <!-- Phone image provided by ionicons-->
         <i class="icon ion-ios-telephone"> </i>
-          <!-- phone number through yelp api call -->
-        {{card.display_phone}}
+        <!-- phone number through yelp api call -->
+        {{card.phone}}
         <br />
         <br />
         <!-- chunky quotation marks provided by ionicons -->
         <i class="icon ion-quote"> </i>
         <!-- yelp api only provides one customer review, this is the one referenced below -->
-        {{card.snippet_text}}
+        {{card.review}}
       </p>
     </div>
     <!-- acts like a footer at the bottom of the card with three tabs for selections -->
