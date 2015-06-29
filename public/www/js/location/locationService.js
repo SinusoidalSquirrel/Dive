@@ -1,11 +1,11 @@
 (function() {
-  // var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
-  var serverUrl = "";
+
+  var serverUrl = "http://polar-springs-4337.herokuapp.com";
   angular
     .module('dive')
     // injecting CardService here so that it can pass the information retrieved from the algorithm and be rendered in user view
     .factory('LocationFactory', ['$http', '$location', 'CardService', function ($http, $location, CardService) {
-      
+
 
       // sends post request to algorithm asking for suggestions in the form of yelp businesses
       var searchLocation = function (location) {
@@ -30,5 +30,3 @@
       };
     }]);
 })();
-
-
