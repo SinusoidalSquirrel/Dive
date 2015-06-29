@@ -1,5 +1,7 @@
 (function() {
-  var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
+  // var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
+  var serverUrl = ""; // this is for localhost testing
+
   angular
     .module('dive')
     .factory('AuthFactory', function ($http, $location, $window) {
@@ -18,7 +20,7 @@
       };
 
       var signup = function (user) {
-        //sends post request to mongodb with signup info 
+        //sends post request to mongodb with signup info
         return $http({
           method: 'POST',
           url: serverUrl + '/users/signup',
@@ -26,7 +28,7 @@
           contentType: "application/json"
         })
         .then(function (err, resp) {
-            //only returns token 
+            //only returns token
             return resp.data.token
         });
       };
@@ -51,4 +53,3 @@
       };
     });
 })();
-

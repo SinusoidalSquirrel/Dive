@@ -6,6 +6,8 @@ module.exports = function(app){
 
     app.route('/business/')
         .post(yelpController.businessQuery)
+    app.route('/geolocation/')
+        .post(yelpController.geolocationQuery)
 }
 
 
