@@ -23,6 +23,8 @@ module.exports = function(app, express){
     app.use(cookieParser());
     // app.use(express.static(path.join(__dirname, '../public')));
     app.use(express.static(path.join(__dirname, '../public/www/')));
+    app.use('/ngCordova',  express.static(__dirname + '../public/www/lib/ngCordova/'));
+
 
     app.use('/', routes);
     app.use('/users', userRouter);
