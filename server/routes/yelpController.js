@@ -40,6 +40,7 @@ var yelp = require("yelp").createClient({
         if (err) throw err;
         res.send(200,data)
       })
+
     },
 
     geolocationQuery: function(req, res){
@@ -54,6 +55,7 @@ var yelp = require("yelp").createClient({
         console.log("Google return data is, ", result.results);
         res.send(200, data);
       })
+
     },
 
     feelingQuery: function(req, res){
@@ -63,7 +65,23 @@ var yelp = require("yelp").createClient({
 
       algorithm.rateRestaurant(userId, restaurantID, queryfeeling);
       res.send(200);
+    },
 
+    saveBookmark: function(req, res){
+      var restaurantID = req.body.restaurantID;
+      var userId = req.body.userId;
+
+      algorithm.keep(userId, restaurantID);
+      res.send(200);
+    },
+
+    getBookmark: function(req, res){
+      var userId = req.body.userId;
+      console.log(userId);
+      algorithm.getKept(userId, function(data){
+        console.log(data);
+        res.send(200, data); 
+      });
     }
 
  }

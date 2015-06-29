@@ -10,8 +10,16 @@ module.exports = function(app){
 
     app.route('/feeling/')
         .post(yelpController.feelingQuery)
+
     app.route('/geolocation/')
         .post(yelpController.geolocationQuery)
+
+    app.route('/bookmark/saveBookmark')
+        .post(yelpController.saveBookmark)
+
+    app.route('/bookmark/getBookmark')
+        .post(yelpController.getBookmark)
+
 }
 
 

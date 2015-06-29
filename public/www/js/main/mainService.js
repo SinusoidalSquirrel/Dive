@@ -18,7 +18,6 @@
         // retrieves information from the algorithm to be set to info. This occurs in the beginning and
         // everytime the user gets to the end of the info array.
         this.info = data;
-        console.log(data);
         // reset to 0 to cycle through new information
         this.i = 0;
       }
@@ -41,14 +40,38 @@
         }
       }
 
-      /*
-      this.saveCard = function(){
-          //send information to mongodb to save place for tht specific user
+      
+      this.saveCard = function(id){
+        //send information to mongodb to save place for tht specific user
+        return $http({
+          method: 'POST',
+          url: serverUrl + '/yelpapi/bookmark/saveBookmark',
+          // specifying to only search for bars and only at the location they inputted
+          data: {restaurantID: id, userId: window.localStorage['userId']},
+          contentType: "application/json"
+        })
+        .then(function (resp) {
+          // upon return of data, send it to CardService's retrieve function in the form of an arrays
+          console.log(resp.data);
+        });
       }
-      */
+
+      this.getBookmark = function(){
+        return $http({
+          method: 'POST',
+          url: serverUrl + '/yelpapi/bookmark/getBookmark',
+          // specifying to only search for bars and only at the location they inputted
+          data: {userId: window.localStorage['userId']},
+          contentType: "application/json"
+        })
+        .then(function (resp) {
+          // upon return of data, send it to CardService's retrieve function in the form of an arrays
+          return(resp.data);
+        });
+      }
+      
 
       this.plusLeft = function(id){
-        console.log('left');
         //Send information to algorithm (negative)
         return $http({
           method: 'POST',
@@ -64,7 +87,6 @@
       }
 
       this.plusRight = function(id){
-        console.log('right');
         //Send information to algorithm (positive)
         return $http({
           method: 'POST',

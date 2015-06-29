@@ -33,7 +33,6 @@
         .then(function(response){
           // upon response, reroute to the main page
           $location.path('/app/main');
-          //$scope.search.location = 'TEST';
         });
   	};
     // Adding Geolocation and Geocoding (server gets geocode from Google)
