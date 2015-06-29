@@ -2,6 +2,7 @@
   var serverUrl = "http://polar-springs-4337.herokuapp.com";
   // var serverUrl = ""; // this is for localhost testing
 
+
   angular
     .module('dive')
     .factory('AuthFactory', function ($http, $location, $window) {
