@@ -1,9 +1,5 @@
 var redis = require('redis');
 
-<<<<<<< HEAD
-// By default, redis.createClient() will use 127.0.0.1 and 6379 as the hostname and port respectively.
-// var client = redis.createClient(port, host);
-=======
 // The schema for our database is as follows:
 
 // A user's "Likes" set is saved under the key:  "{userID}:Likes"
@@ -17,7 +13,6 @@ var redis = require('redis');
 
 // The record for a restaurant is saved in a redis hash using the 
 // the restaurant's ID as the key.
->>>>>>> rebasing/androiddeploy
 
 console.log("process.env.REDISTOGO_URL: ", process.env);
 if (process.env.REDISTOGO_URL) {

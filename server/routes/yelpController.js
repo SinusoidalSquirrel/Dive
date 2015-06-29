@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 var algorithm = require('../../server/engines/algorithmAPI.js');
->>>>>>> rebasing/androiddeploy
 var curl = require('curlrequest');
 var yelp = require("yelp").createClient({
   consumer_key: "KjdDsNphOnZeY8w3YxJVcw",
@@ -15,16 +12,9 @@ var yelp = require("yelp").createClient({
 
  module.exports = {
     searchQuery: function(req, res){
-<<<<<<< HEAD
-
-        var queryName = req.body.term
-        var queryLocation = req.body.location
-
-=======
         var queryName = req.body.term;
         var queryLocation = req.body.location;
         var userId = req.body.userId;
->>>>>>> rebasing/androiddeploy
         console.log("REQ name", queryName)
         console.log("REQ location", queryLocation)
 
@@ -66,8 +56,6 @@ var yelp = require("yelp").createClient({
       })
     },
 
-<<<<<<< HEAD
-=======
     feelingQuery: function(req, res){
       var queryfeeling = req.body.feeling;
       var restaurantID = req.body.restaurantID;
@@ -78,5 +66,4 @@ var yelp = require("yelp").createClient({
 
     }
 
->>>>>>> rebasing/androiddeploy
  }

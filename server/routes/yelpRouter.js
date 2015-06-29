@@ -7,12 +7,9 @@ module.exports = function(app){
 
     app.route('/business/')
         .post(yelpController.businessQuery)
-<<<<<<< HEAD
-=======
 
     app.route('/feeling/')
         .post(yelpController.feelingQuery)
->>>>>>> rebasing/androiddeploy
     app.route('/geolocation/')
         .post(yelpController.geolocationQuery)
 }

@@ -1,8 +1,5 @@
 (function() {
-<<<<<<< HEAD
-=======
 
->>>>>>> rebasing/androiddeploy
   var serverUrl = "http://polar-springs-4337.herokuapp.com";
   angular
     .module('dive')
