@@ -25,7 +25,6 @@ module.exports = function(app, express){
     app.use(express.static(path.join(__dirname, '../public/www/')));
     app.use('/ngCordova',  express.static(__dirname + '../public/www/lib/ngCordova/'));
 
-
     app.use('/', routes);
     app.use('/users', userRouter);
     app.use('/yelpapi/', yelpRouter);
