@@ -1,6 +1,6 @@
 (function() {
-  // var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
-  var serverUrl = "";
+  var serverUrl = "http://polar-springs-4337.herokuapp.com";
+  // var serverUrl = "";
   angular
     .module('dive')
 
