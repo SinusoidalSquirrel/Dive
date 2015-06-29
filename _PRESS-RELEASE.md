@@ -40,7 +40,7 @@ Once the project moves into development, the press release can be used as a touc
 ## Customer Quote ##
   > I always hated the time we used to spend standing around trying to find where to go next, especially when that was time we could have spent drinking. Thanks, Dive!
 
-    How did this not exist before? Yelp was always so slow to pick through...who knows if the reviews other people put in fit for me too. Now I just Dive and I'm off.
+   > How did this not exist before? Yelp is so slow to pick through...who knows if the reviews other people put in fit for me too. Now I just Dive and I'm off.
 
 ## Closing and Call to Action ##
   > Check out the app and get to the bars!
