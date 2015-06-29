@@ -1,6 +1,6 @@
 (function() {
-  // var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
-  var serverUrl = ""; // this is for localhost testing
+  var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
+  // var serverUrl = ""; // this is for localhost testing
 
   angular
     .module('dive')
@@ -15,7 +15,7 @@
           contentType: "application/json"
         })
         .then(function (err, resp) {
-           return resp.data.token;
+           return err.data.token;
         });
       };
 
@@ -29,7 +29,7 @@
         })
         .then(function (err, resp) {
             //only returns token
-            return resp.data.token
+            return err.data.token
         });
       };
 
