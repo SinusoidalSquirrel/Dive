@@ -1,5 +1,6 @@
+var curl = require('curlrequest');
 var yelp = require("yelp").createClient({
-  consumer_key: "KjdDsNphOnZeY8w3YxJVcw", 
+  consumer_key: "KjdDsNphOnZeY8w3YxJVcw",
   consumer_secret: "6itM-P0nsf2qYvPpQCfnU6BABd0",
   token: "KyiFVSincgrzSHOBtHWA2KzGrakhBj5G",
   token_secret: "tc5_Rdwu8XqNb2fhM7TC7YDRkoI"
@@ -13,7 +14,7 @@ var yelp = require("yelp").createClient({
 
         var queryName = req.body.term
         var queryLocation = req.body.location
-        
+
         console.log("REQ name", queryName)
         console.log("REQ location", queryLocation)
 
@@ -27,12 +28,24 @@ var yelp = require("yelp").createClient({
     businessQuery: function(req, res){
       console.log('In business Query in server, ', req.body)
       var queryId = req.body.id
-
       yelp.business(queryId, function(err, data){
         if (err) throw err;
         res.send(200,data)
       })
+    },
 
+    geolocationQuery: function(req, res){
+      var latitude = req.body.lat;
+      var longitude = req.body.long;
+      console.log('In geolocationQuery in server, lat,long is' + latitude +','+longitude)
+      var options = {
+        url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+ latitude+','+ longitude +'&key=AIzaSyBeBvUBLMFkYasyDu-rIrCk03TCxoqZydQ',
+      }
+      curl.request(options, function(err, data){
+        var result = JSON.parse(data);
+        console.log("Google return data is, ", result.results);
+        res.send(200, data);
+      })
     },
 
  }
