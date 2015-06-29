@@ -7,9 +7,9 @@
   // the 2nd parameter is an array of 'requires'
   // 'starter.controllers' is found in controllers.js
   angular
-    .module('dive', ['ionic', 'ui.router'])
+    .module('dive', ['ionic', 'ui.router', 'ngCordova'])
 
-    .run(function($ionicPlatform) {
+    .run(function($ionicPlatform, $cordovaGeolocation, $http, geoLocation) {
       $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -76,7 +76,7 @@
       // if none of the above states are matched, use this as the fallback
       $urlRouterProvider.otherwise('/login');
 
-      // the $httpProvider contains an array of interceptors. 
+      // the $httpProvider contains an array of interceptors.
       // an interceptor is simply a regular service factory that is registered to that array
       // here we are adding the interceptor created below to the $httpInterceptor.interceptors array
       $httpProvider.interceptors.push('AttachTokens');
@@ -92,7 +92,7 @@
           if(jwt){
             object.headers['x-access-token'] = jwt;
           }
-          // add the Access-Control-Allow-Origin header to the response requests 
+          // add the Access-Control-Allow-Origin header to the response requests
           // to allow cross-domain requests
           object.headers['Allow-Control-Allow-Origin'] = '*';
           return object;
@@ -100,10 +100,17 @@
       };
       return attach;
     })
+    .factory('geoLocation', function(){
+      return {
+        setGeolocation: function(latitude, longtitude){
+          console.log("Latitude is,", latitude + ', ' + longtitude );
+        }
+      }
+    })
     .run(function ($rootScope, $location, AuthFactory) {
       // we use .run to register work which should be performed when the injector is done loading all modules.
       // here we are implementing a listener on the $stateChangeStart event to track the next route navigation
-      // we want to make sure the user is authorized 
+      // we want to make sure the user is authorized
       // when it does change routes, we look for the token in localstorage
       // and send that token to the server to see if it is a real user or hasn't expired
       // if it's not valid, we then redirect back to login
@@ -118,15 +125,3 @@
     });
 
 })();
-
-
-
-
-
-
-
-
-
-
-
-
