@@ -1,5 +1,5 @@
 (function() {
-  var serverUrl = "http://tranquil-badlands-7300.herokuapp.com";
+  var serverUrl = "http://polar-springs-4337.herokuapp.com";
   angular
     .module('dive')
     //injecting CardService here so that it can pass the information retrieved from the algorithm and be rendered in user view
@@ -23,5 +23,3 @@
       };
     }]);
 })();
-
-
