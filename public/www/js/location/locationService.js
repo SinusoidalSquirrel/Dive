@@ -1,6 +1,8 @@
 (function() {
 
   var serverUrl = "http://polar-springs-4337.herokuapp.com";
+  // var serverUrl = "";
+
   angular
     .module('dive')
     // injecting CardService here so that it can pass the information retrieved from the algorithm and be rendered in user view
