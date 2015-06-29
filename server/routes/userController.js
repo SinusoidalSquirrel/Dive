@@ -33,7 +33,7 @@ module.exports = {
       .fail(function(error){
         next(error);
       })
-  }, 
+  },
 
   signup: function (req, res, next) {
     var username = req.body.username;
@@ -62,14 +62,16 @@ module.exports = {
         // creates a new token once user is created
         var token = jwt.encode(user, 'secret');
         res.json({token: token});
+        console.log('res.json token', token)
       })
       .fail(function(error){
         next(error);
+        console.log('in fail')
       })
 
   },
 
   checkAuth: function (req, res, next) {
-    
+
   }
 };
